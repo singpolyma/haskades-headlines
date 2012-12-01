@@ -1,0 +1,1 @@
+include (../headlines.pro)
