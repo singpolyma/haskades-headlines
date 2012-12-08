@@ -1,8 +1,10 @@
 import bb.cascades 1.0
 import bb.system 1.0
+import bb.platform 1.0
 
 NavigationPane {
 	id: navigationPane
+	property bool shouldNotify: false
 
 	onCreationCompleted: {
 		app.Refreshing.connect(function() {
@@ -14,12 +16,27 @@ NavigationPane {
 		});
 
 		app.NewHeadline.connect(function(title, link, pubDate) {
+			if(navigationPane.shouldNotify) notification.notify();
 			feedItems.insert({title: title, link: link, pubDate: pubDate});
 		});
 
 		app.Error.connect(function(msg) {
 			errorDialog.body = msg;
 			errorDialog.show();
+		});
+
+		Application.aboutToQuit.connect(function() {
+			notification.clearEffectsForAll();
+		});
+
+		Application.fullscreen.connect(function() {
+			navigationPane.shouldNotify = false;
+			notification.clearEffectsForAll();
+			notification.resetTimestamp(); // Need this so we can send another
+		});
+
+		Application.thumbnail.connect(function() {
+			navigationPane.shouldNotify = true;
 		});
 
 		app.refreshEach(parseInt(refreshSetting.text));
@@ -111,6 +128,10 @@ NavigationPane {
 			cancelButton.label: undefined
 			title: "Error"
 			body: ""
+		},
+
+		Notification {
+			id: notification
 		},
 
 		Page {
