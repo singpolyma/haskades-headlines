@@ -16,7 +16,6 @@ NavigationPane {
 		});
 
 		app.Error.connect(function(msg) {
-			errorDialog.cancelButton.label = "";
 			errorDialog.body = msg;
 			errorDialog.show();
 		});
@@ -99,6 +98,7 @@ NavigationPane {
 	attachedObjects: [
 		SystemDialog {
 			id: errorDialog
+			cancelButton.label: undefined
 			title: "Error"
 			body: ""
 		}
