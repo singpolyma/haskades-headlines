@@ -3,8 +3,9 @@ module Main (main) where
 import Prelude (show)
 import BasicPrelude hiding (show)
 import Data.Char (toUpper)
-import Control.Concurrent (forkIO)
-import Control.Error
+import Control.Concurrent (forkIO, threadDelay, Chan, newChan, readChan, writeChan)
+import Control.Monad.Trans.State (get, put, runStateT)
+import Control.Error (EitherT, hoistEither, fmapLT, throwT, note, eitherT, tryIO)
 
 import Codec.Text.IConv (EncodingName, convertFuzzy, Fuzzy(Transliterate))
 import qualified Data.Text.Lazy as TL
@@ -20,7 +21,7 @@ import Data.Time.Git (approxidate, posixToUTC)
 import Data.Time (UTCTime, getCurrentTime)
 import Text.Feed.Types (Feed, Item(..))
 import Text.Feed.Import (parseFeedString)
-import Text.Feed.Query (getFeedItems, getItemTitle, getItemLink, getItemPublishDate)
+import Text.Feed.Query (getFeedItems, getItemTitle, getItemLink, getItemPublishDate, getItemId)
 import qualified Text.Atom.Feed as Atom
 
 import Types
@@ -72,15 +73,46 @@ itemToSignal now it = NewHeadline {
 		date = maybe now posixToUTC (approxidate =<< getItemPublishDate it)
 	}
 
-refreshFeed :: IO ()
-refreshFeed = do
-	emit ResetHeadlines
-	now <- getCurrentTime
-	void $ forkIO $ eitherT (emit . Error) return $
-		(map (itemToSignal now) . getFeedItems) <$> fmapLT show fetchFeed >>=
-		mapM_ emit
+-- | Takes a list of item ids not to emit, and return list of item ids emitted
+refreshFeed :: (MonadIO m) => [String] -> m [String]
+refreshFeed noEmit = liftIO $ done <=< eitherT handleError return $ do
+	liftIO $ emit Refreshing
+	now <- liftIO getCurrentTime
+	items <- (filter ((`notElem` noEmit') . fmap snd . getItemId) . getFeedItems)
+		<$> fmapLT show fetchFeed
+	mapM_ (emit . itemToSignal now) items
+	return (mapMaybe (fmap snd . getItemId) items)
+	where
+	-- Always emit DoneRefreshing, even on error
+	done ids = emit DoneRefreshing >> return ids
+	handleError e = emit (Error e) >> return []
+	noEmit' = map Just noEmit
+
+refreshServer :: Chan RefreshMessage -> IO ()
+refreshServer chan = void $ (`runStateT` (0,[])) $ forever $ do
+	msg <- liftIO $ readChan chan
+	case msg of
+		RefreshNow -> do
+			(t,ids) <- get
+			newIds <- refreshFeed ids
+			put (t, ids ++ newIds)
+		RefreshEach t -> do
+			(oldt,ids) <- get
+			put (t,ids)
+			liftIO $ when (oldt < 1) (writeChan chan RefreshTime)
+		RefreshTime -> do
+			liftIO $ writeChan chan RefreshNow
+			(t,_) <- get
+			when (t > 0) $
+				liftIO $ void $ forkIO $ do
+					threadDelay (t*1000000)
+					writeChan chan RefreshTime
 
 main :: IO ()
-main = haskadesRun "asset:///ui.qml" Slots {
-	refresh = refreshFeed
-}
+main = do
+	refreshChan <- newChan
+	void $ forkIO $ refreshServer refreshChan
+	haskadesRun "asset:///ui.qml" Slots {
+			refreshEach = writeChan refreshChan . RefreshEach,
+			refresh = writeChan refreshChan RefreshNow
+		}

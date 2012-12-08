@@ -3,13 +3,15 @@ import bb.system 1.0
 
 NavigationPane {
 	onCreationCompleted: {
-		app.ResetHeadlines.connect(function() {
-			feedItems.clear();
+		app.Refreshing.connect(function() {
 			indicator.start();
 		});
 
-		app.NewHeadline.connect(function(title, link, summary, pubDate) {
+		app.DoneRefreshing.connect(function() {
 			indicator.stop();
+		});
+
+		app.NewHeadline.connect(function(title, link, summary, pubDate) {
 			feedItems.insert({title: title, link: link, summary: summary, pubDate: pubDate});
 		});
 
@@ -19,7 +21,7 @@ NavigationPane {
 			errorDialog.show();
 		});
 
-		app.refresh();
+		app.refreshEach(120);
 	}
 
 	Page {
