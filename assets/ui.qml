@@ -2,6 +2,8 @@ import bb.cascades 1.0
 import bb.system 1.0
 
 NavigationPane {
+	id: navigationPane
+
 	onCreationCompleted: {
 		app.Refreshing.connect(function() {
 			indicator.start();
@@ -20,7 +22,15 @@ NavigationPane {
 			errorDialog.show();
 		});
 
-		app.refreshEach(120);
+		app.refreshEach(parseInt(refreshSetting.text));
+	}
+
+	Menu.definition: MenuDefinition {
+		settingsAction: SettingsActionItem {
+			onTriggered: {
+				navigationPane.push(settingsPage);
+			}
+		}
 	}
 
 	Page {
@@ -101,6 +111,34 @@ NavigationPane {
 			cancelButton.label: undefined
 			title: "Error"
 			body: ""
+		},
+
+		Page {
+			id: settingsPage
+
+			Container {
+				layout: StackLayout {
+					orientation: LayoutOrientation.LeftToRight
+				}
+
+				Label {
+					text: "Refresh every "
+				}
+
+				TextField {
+					id: refreshSetting
+					inputMode: TextFieldInputMode.NumbersAndPunctuation
+					text: "10"
+
+					onTextChanged: {
+						app.refreshEach(parseInt(refreshSetting.text));
+					}
+				}
+
+				Label {
+					text: " seconds"
+				}
+			}
 		}
 	]
 }
