@@ -143,13 +143,15 @@ NavigationPane {
 				}
 
 				Label {
-					text: "Refresh every "
+					text: "Refresh every"
+					verticalAlignment: VerticalAlignment.Center
 				}
 
 				TextField {
 					id: refreshSetting
 					inputMode: TextFieldInputMode.NumbersAndPunctuation
-					text: "10"
+					text: "0"
+					verticalAlignment: VerticalAlignment.Center
 
 					onTextChanged: {
 						app.refreshEach(parseInt(refreshSetting.text));
@@ -157,7 +159,8 @@ NavigationPane {
 				}
 
 				Label {
-					text: " seconds"
+					text: "seconds (0 for never)"
+					verticalAlignment: VerticalAlignment.Center
 				}
 			}
 		}
