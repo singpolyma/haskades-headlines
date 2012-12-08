@@ -38,6 +38,8 @@
 		<transparent>false</transparent>
 	</initialWindow>
 
+	<cascadesTheme>dark</cascadesTheme>
+
 	<!--  The category where the application appears. Either core.games or core.media. -->
 	<category>core.media</category>
 <!--
