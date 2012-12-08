@@ -22,7 +22,6 @@ import Data.Time (UTCTime, getCurrentTime)
 import Text.Feed.Types (Feed, Item(..))
 import Text.Feed.Import (parseFeedString)
 import Text.Feed.Query (getFeedItems, getItemTitle, getItemLink, getItemPublishDate, getItemId)
-import qualified Text.Atom.Feed as Atom
 
 import Types
 import HaskadesBinding
