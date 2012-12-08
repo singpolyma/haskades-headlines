@@ -12,5 +12,5 @@ data Slots = Slots {
 data Signal =
 	Refreshing |
 	DoneRefreshing |
-	NewHeadline {title::String, link::String, summary::String, date::UTCTime} |
+	NewHeadline {title::String, link::String, date::UTCTime} |
 	Error String

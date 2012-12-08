@@ -56,20 +56,10 @@ fetchFeed = textFromByteString "UTF-8" <$> fetch feed >>=
 	hoistEither . note (HTTP.ErrorMisc "Feed parse failed") .
 	parseFeedString . TL.unpack
 
-getTextSummary :: Item -> Maybe String
-getTextSummary (AtomItem (Atom.Entry {
-		Atom.entrySummary = Just (Atom.TextString s)
-	})) = Just s
-getTextSummary (AtomItem (Atom.Entry {
-		Atom.entryContent = Just (Atom.TextContent s)
-	})) = Just s
-getTextSummary _ = Nothing -- TODO: Strip HTML?
-
 itemToSignal :: UTCTime -> Item -> Signal
 itemToSignal now it = NewHeadline {
 		title = fromMaybe "" $ getItemTitle it,
 		link  = fromMaybe "" $ getItemLink it,
-		summary = fromMaybe "" $ getTextSummary it,
 		date = maybe now posixToUTC (approxidate =<< getItemPublishDate it)
 	}
 

@@ -11,8 +11,8 @@ NavigationPane {
 			indicator.stop();
 		});
 
-		app.NewHeadline.connect(function(title, link, summary, pubDate) {
-			feedItems.insert({title: title, link: link, summary: summary, pubDate: pubDate});
+		app.NewHeadline.connect(function(title, link, pubDate) {
+			feedItems.insert({title: title, link: link, pubDate: pubDate});
 		});
 
 		app.Error.connect(function(msg) {
