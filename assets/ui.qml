@@ -105,16 +105,18 @@ NavigationPane {
 
 				onTriggered: {
 					var selectedItem = dataModel.data(indexPath);
-					invokeBrowser.query.uri = selectedItem.link;
-					invokeBrowser.trigger("bb.action.OPEN");
+					invokeBrowser.uri = selectedItem.link;
+					invokeBrowser.updateQuery();
 				}
 
 				attachedObjects: [
 					Invocation {
-						id: invokeBrowser
-
 						query: InvokeQuery {
-							uri: ""
+							id: invokeBrowser
+							invokeTargetId: "sys.browser"
+						}
+						onArmed: {
+							trigger("bb.action.OPEN")
 						}
 					}
 				]
