@@ -4,8 +4,10 @@ TARGET        = $(QMAKE_TARGET)
 GHC_X86       = ghc -O2 -XHaskell98 -Wall -fno-warn-name-shadowing -lsocket
 GHC_ARM       = echo
 
-
 all: Makefile $(QMAKE_TARGET)
+
+Simulator-Debug.bar: Simulator-Debug
+	blackberry-nativepackager -package $@ bar-descriptor.xml -configuration Simulator-Debug
 
 clean:
 	$(MAKE) -C ./arm -f Makefile sureclean

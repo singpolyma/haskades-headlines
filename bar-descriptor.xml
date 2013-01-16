@@ -9,7 +9,7 @@
 
 	<!-- A universally unique application identifier. Must be unique across all BlackBerry 10 applications.
 		 Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
-	<id>net.singpolyma.haskades-headlens</id>
+	<id>net.singpolyma.haskades-headlines</id>
 
 	<!-- The name that is displayed in the BlackBerry 10 application installer.
 		 May have multiple values for each language. See samples or xsd schema file. Optional. -->
@@ -42,26 +42,21 @@
 
 	<!--  The category where the application appears. Either core.games or core.media. -->
 	<category>core.media</category>
-<!--
-	<configuration id="com.qnx.qcc.toolChain.398719213" name="Default">
-	   <platformArchitecture>armle-v7</platformArchitecture>
-	   <asset path="arm/o.le-v7-g/hellocascades" entry="true" type="Qnx/Elf">hellocascades</asset>
-	</configuration>
 	<configuration id="com.qnx.qcc.toolChain.530812073" name="Device-Debug">
-	   <platformArchitecture>armle-v7</platformArchitecture>
-	   <asset path="arm/o.le-v7-g/hellocascades" entry="true" type="Qnx/Elf">hellocascades</asset>
+		<platformArchitecture>armle-v7</platformArchitecture>
+		<asset path="arm/o.le-v7-g/Main" entry="true" type="Qnx/Elf">Main</asset>
+		<asset path="arm/o.le-v7-g/libheadlines.so.1" type="Qnx/Elf">lib/libheadlines.so.1</asset>
 	</configuration>
 	<configuration id="com.qnx.qcc.toolChain.585662339" name="Device-Release">
-	   <platformArchitecture>armle-v7</platformArchitecture>
-	   <asset path="arm/o.le-v7/hellocascades" entry="true" type="Qnx/Elf">hellocascades</asset>
+		<platformArchitecture>armle-v7</platformArchitecture>
+		<asset path="arm/o.le-v7/Main" entry="true" type="Qnx/Elf">Main</asset>
+		<asset path="arm/o.le-v7/libheadlines.so.1" type="Qnx/Elf">lib/libheadlines.so.1</asset>
 	</configuration>
 	<configuration id="com.qnx.qcc.toolChain.1526872727" name="Simulator-Debug">
-	   <platformArchitecture>x86</platformArchitecture>
-	   <asset path="x86/o-g/hellocascades" entry="true" type="Qnx/Elf">hellocascades</asset>
+		<platformArchitecture>x86</platformArchitecture>
+		<asset path="x86/o-g/Main" entry="true" type="Qnx/Elf">Main</asset>
+		<asset path="x86/o-g/libheadlines.so.1" type="Qnx/Elf">lib/libheadlines.so.1</asset>
 	</configuration>
--->
-	<asset path="x86/o-g/Main" entry="true" type="Qnx/Elf">Main</asset>
-	<asset path="x86/o-g/libheadlines.so.1" entry="true" type="Qnx/Elf">lib/libheadlines.so.1</asset>
 
 	<!-- Application assets -->
 	<asset path="assets">assets</asset>
