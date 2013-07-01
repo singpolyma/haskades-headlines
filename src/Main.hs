@@ -55,7 +55,7 @@ fetchFeed = textFromByteString "UTF-8" <$> fetch feed >>=
 	hoistEither . note (HTTP.ErrorMisc "Feed parse failed") .
 	parseFeedString . TL.unpack
 
-itemToSignal :: UTCTime -> Item -> Signal
+itemToSignal :: UTCTime -> Item -> SignalToUI
 itemToSignal now it = NewHeadline {
 		title = fromMaybe "" $ getItemTitle it,
 		link  = fromMaybe "" $ getItemLink it,
@@ -81,27 +81,31 @@ refreshServer :: Chan RefreshMessage -> IO ()
 refreshServer chan = void $ (`runStateT` (0,[])) $ forever $ do
 	msg <- liftIO $ readChan chan
 	case msg of
-		RefreshNow -> do
+		RefreshNowM -> do
 			(t,ids) <- get
 			newIds <- refreshFeed ids
 			put (t, ids ++ newIds)
-		RefreshEach t -> do
+		RefreshEachM t -> do
 			(oldt,ids) <- get
 			put (t,ids)
-			liftIO $ when (oldt < 1) (writeChan chan RefreshTime)
-		RefreshTime -> do
-			liftIO $ writeChan chan RefreshNow
+			liftIO $ when (oldt < 1) (writeChan chan RefreshTimeM)
+		RefreshTimeM -> do
+			liftIO $ writeChan chan RefreshNowM
 			(t,_) <- get
 			when (t > 0) $
 				liftIO $ void $ forkIO $ do
 					threadDelay (t*1000000)
-					writeChan chan RefreshTime
+					writeChan chan RefreshTimeM
+
+fromUIThread :: Chan RefreshMessage -> IO ()
+fromUIThread refreshChan = forever (popSignalFromUI >>= handleFromUI refreshChan)
+
+handleFromUI :: Chan RefreshMessage -> SignalFromUI -> IO ()
+handleFromUI refreshChan (RefreshEach n) = writeChan refreshChan (RefreshEachM n)
 
 main :: IO ()
 main = do
 	refreshChan <- newChan
 	void $ forkIO $ refreshServer refreshChan
-	haskadesRun "asset:///ui.qml" Slots {
-			refreshEach = writeChan refreshChan . RefreshEach,
-			refresh = writeChan refreshChan RefreshNow
-		}
+	void $ forkIO $ fromUIThread refreshChan
+	haskadesRun "asset:///ui.qml"

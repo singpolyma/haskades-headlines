@@ -39,7 +39,7 @@ NavigationPane {
 			navigationPane.shouldNotify = true;
 		});
 
-		app.refreshEach(parseInt(refreshSetting.text));
+		app.RefreshEach(parseInt(refreshSetting.text));
 	}
 
 	Menu.definition: MenuDefinition {
@@ -156,7 +156,7 @@ NavigationPane {
 					verticalAlignment: VerticalAlignment.Center
 
 					onTextChanged: {
-						app.refreshEach(parseInt(refreshSetting.text));
+						app.RefreshEach(parseInt(refreshSetting.text));
 					}
 				}
 

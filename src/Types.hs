@@ -2,14 +2,11 @@ module Types where
 
 import Data.Time (UTCTime)
 
-data RefreshMessage = RefreshNow | RefreshEach Int | RefreshTime
+data RefreshMessage = RefreshNowM | RefreshEachM Int | RefreshTimeM
 
-data Slots = Slots {
-	refreshEach :: Int -> IO (),
-	refresh :: IO ()
-}
+data SignalFromUI = RefreshEach Int
 
-data Signal =
+data SignalToUI =
 	Refreshing |
 	DoneRefreshing |
 	NewHeadline {title::String, link::String, date::UTCTime} |
