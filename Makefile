@@ -3,6 +3,7 @@ QMAKE         = $(QNX_HOST)/usr/bin/qmake
 TARGET        = $(QMAKE_TARGET)
 GHC_X86       = $(HOME)/src/ghc-qnx-nto-i486/inplace/bin/ghc-stage1 -O2 -XHaskell98 -Wall -fno-warn-name-shadowing -lsocket
 GHC_ARM       = $(HOME)/src/ghc-qnx-nto-arm-unregistered-llvm/inplace/bin/ghc-stage1 -O2 -XHaskell98 -Wall -fno-warn-name-shadowing -lsocket
+HASKADES      = haskades
 
 all: Makefile $(QMAKE_TARGET)
 
@@ -40,13 +41,13 @@ x86/HaskadesBinding.hs: src/HaskadesBinding.hsc src/haskades_run.h
 	hsc2hs -o x86/HaskadesBinding.hs -c i486-pc-nto-qnx8.0.0-gcc -l 'qcc -Vgcc_ntox86' -I. -I src/ --cross-safe -x src/HaskadesBinding.hsc
 
 src/HaskadesBinding.hsc: src/Types.hs
-	../haskades2/dist/build/haskades/haskades src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
+	$(HASKADES) src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
 
 src/haskades_run.cpp: src/Types.hs
-	../haskades2/dist/build/haskades/haskades src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
+	$(HASKADES) src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
 
 src/haskades_run.h: src/Types.hs
-	../haskades2/dist/build/haskades/haskades src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
+	$(HASKADES) src/HaskadesBinding.hsc src/haskades_run.cpp src/haskades_run.h < src/Types.hs
 
 device: src/haskades_run.cpp arm/HaskadesBinding.hs
 	$(MAKE) -C ./arm -f Makefile all

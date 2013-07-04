@@ -97,9 +97,6 @@ refreshServer chan = void $ (`runStateT` (0,[])) $ forever $ do
 					threadDelay (t*1000000)
 					writeChan chan RefreshTimeM
 
-fromUIThread :: Chan RefreshMessage -> IO ()
-fromUIThread refreshChan = forever (popSignalFromUI >>= handleFromUI refreshChan)
-
 handleFromUI :: Chan RefreshMessage -> SignalFromUI -> IO ()
 handleFromUI refreshChan (RefreshEach n) = writeChan refreshChan (RefreshEachM n)
 
@@ -107,5 +104,4 @@ main :: IO ()
 main = do
 	refreshChan <- newChan
 	void $ forkIO $ refreshServer refreshChan
-	void $ forkIO $ fromUIThread refreshChan
-	haskadesRun "asset:///ui.qml"
+	haskadesRun "asset:///ui.qml" (handleFromUI refreshChan)
